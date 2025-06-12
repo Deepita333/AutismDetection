@@ -2,20 +2,7 @@
 ## 🧠 Autism Detection Web App
 This is a Flask-based web application that screens individuals for autism spectrum disorder (ASD) using the Q-CHAT-10 questionnaire. The application uses a machine learning model trained on real data to predict the likelihood of autism based on user responses.
 
-AUTISM/
-│
-├── app.py                           # Main Flask application
-├── autism_detection_qchat_model.pkl# Trained ML model
-├── scaler_qchat.pkl                # Scaler used during model training
-├── Autism.csv                      # Dataset used for training
-├── detailed_assessment_model.pkl   # (Optional) For extended assessments
-├── templates/                      # HTML templates for the web app
-│   ├── home.html
-│   ├── qchat.html
-│   └── result.html
-├── static/                         # Static files (CSS/JS)
-├── uploads/                        # Directory for any uploads (if used)
-└── app.log                         # Log file (for debugging/errors)
+![image](https://github.com/user-attachments/assets/9a30178a-c59d-4a05-94e2-b6ea6031b4fc)
 
 ## 🚀 Features
 📋 Patient Form: Capture patient demographics and background information.
@@ -37,16 +24,20 @@ Deployment: Localhost (development mode)
 ## 🛠️ How to Run the Project
 
 Clone the repository
+
 git clone https://github.com/yourusername/autism-screening-app.git
 cd autism-screening-app
 
 Install dependencies
+
 pip install flask scikit-learn numpy joblib
 
 Run the application
+
 python app.py
 
 Open your browser and go to:
+
 http://localhost:5000/
 
 ## 📌 Disclaimer
