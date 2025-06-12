@@ -23,20 +23,21 @@ Deployment: Localhost (development mode)
 
 ## 🛠️ How to Run the Project
 
-Clone the repository
+### Clone the repository
 
 git clone https://github.com/yourusername/autism-screening-app.git
+
 cd autism-screening-app
 
-Install dependencies
+### Install dependencies
 
 pip install flask scikit-learn numpy joblib
 
-Run the application
+### Run the application
 
 python app.py
 
-Open your browser and go to:
+### Open your browser and go to:
 
 http://localhost:5000/
 
