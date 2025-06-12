@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Q-CHAT-10 Autism Screening</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+      width: 60px;
+      height: 60px;
+      top: 60%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+    
+    .shape:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: slideInDown 1s ease-out;
+    }
+    
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.2rem;
+      font-weight: 400;
+      animation: slideInUp 1s ease-out 0.3s both;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 50px 40px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 2;
+      animation: slideInUp 1s ease-out 0.6s both;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(102, 126, 234, 0.2);
+      border-radius: 3px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .question {
+      margin-bottom: 35px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      transition: all 0.3s ease;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: questionSlide 0.6s ease-out forwards;
+    }
+    
+    .question:nth-child(n) {
+      animation-delay: calc(0.1s * var(--question-index));
+    }
+    
+    @keyframes questionSlide {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .question:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
+      border-color: rgba(102, 126, 234, 0.3);
+    }
+    
+    .question-label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #2d3748;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .option {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      border-radius: 12px;
+      font-weight: 500;
+      color: #4a5568;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .option-label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .option:hover .option-label::before {
+      left: 100%;
+    }
+    
+    .option input[type="radio"]:checked + .option-label {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: transparent;
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .radio-indicator {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e0;
+      border-radius: 50%;
+      margin-right: 12px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .radio-indicator::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.2s ease;
+    }
+    
+    .option input[type="radio"]:checked + .option-label .radio-indicator {
+      border-color: white;
+    }
+    
+    .option input[type="radio"]:checked + .option-label .radio-indicator::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .submit-container {
+      text-align: center;
+      margin-top: 50px;
+      animation: slideInUp 1s ease-out 1.2s both;
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      padding: 18px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 15px;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .form-container {
+        padding: 30px 25px;
+      }
+      
+      .options {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .question {
+        padding: 20px;
+      }
+    }
+    
+    .info-panel {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideInUp 1s ease-out 0.9s both;
+    }
+    
+    .info-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Q-CHAT-10</h1>
+      <p class="subtitle">Autism Screening Assessment</p>
+    </div>
+
+    <div class="info-panel">
+      <p class="info-text">
+        This questionnaire helps identify early signs of autism spectrum conditions in toddlers. 
+        Please answer each question based on your child's typical behavior.
+      </p>
+    </div>
+
+    <div class="form-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <form method="POST" id="assessmentForm">
+        <div class="question" style="--question-index: 1">
+          <div class="question-label">Does your child look at you when you call his/her name?</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q1" value="1" id="q1_no" required>
+              <label for="q1_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q1" value="0" id="q1_yes">
+              <label for="q1_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 2">
+          <div class="question-label">How easy is it for you to get eye contact with your child?</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q2" value="1" id="q2_difficult" required>
+              <label for="q2_difficult" class="option-label">
+                <div class="radio-indicator"></div>
+                Difficult
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q2" value="0" id="q2_easy">
+              <label for="q2_easy" class="option-label">
+                <div class="radio-indicator"></div>
+                Easy
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 3">
+          <div class="question-label">Does your child point to indicate that s/he wants something? (e.g., a toy that is out of reach)</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q3" value="1" id="q3_no" required>
+              <label for="q3_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q3" value="0" id="q3_yes">
+              <label for="q3_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 4">
+          <div class="question-label">Does your child point to share interest with you? (e.g., pointing at an interesting sight)</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q4" value="1" id="q4_no" required>
+              <label for="q4_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q4" value="0" id="q4_yes">
+              <label for="q4_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 5">
+          <div class="question-label">Does your child pretend? (e.g., care for dolls, talk on a toy phone)</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q5" value="1" id="q5_no" required>
+              <label for="q5_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q5" value="0" id="q5_yes">
+              <label for="q5_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 6">
+          <div class="question-label">Does your child follow where you're looking?</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q6" value="1" id="q6_no" required>
+              <label for="q6_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q6" value="0" id="q6_yes">
+              <label for="q6_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 7">
+          <div class="question-label">If you or someone else in the family is visibly upset, does your child show signs of wanting to comfort them? (e.g., stroking hair, hugging them)</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q7" value="1" id="q7_no" required>
+              <label for="q7_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q7" value="0" id="q7_yes">
+              <label for="q7_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 8">
+          <div class="question-label">Would you describe your child's first words as:</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q8" value="1" id="q8_delayed" required>
+              <label for="q8_delayed" class="option-label">
+                <div class="radio-indicator"></div>
+                Delayed
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q8" value="0" id="q8_typical">
+              <label for="q8_typical" class="option-label">
+                <div class="radio-indicator"></div>
+                Typical
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 9">
+          <div class="question-label">Does your child use simple gestures? (e.g., wave goodbye)</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q9" value="1" id="q9_no" required>
+              <label for="q9_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q9" value="0" id="q9_yes">
+              <label for="q9_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question" style="--question-index: 10">
+          <div class="question-label">Does your child stare at nothing with no apparent purpose?</div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q10" value="1" id="q10_yes" required>
+              <label for="q10_yes" class="option-label">
+                <div class="radio-indicator"></div>
+                Yes
+              </label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q10" value="0" id="q10_no">
+              <label for="q10_no" class="option-label">
+                <div class="radio-indicator"></div>
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-container">
+          <div class="submit-btn" style="background: linear-gradient(135deg, #cbd5e0, #a0aec0); cursor: default; opacity: 0.6;">
+            Answer all questions to continue
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Progress bar functionality
+    const form = document.getElementById('assessmentForm');
+    const progressFill = document.getElementById('progressFill');
+    const totalQuestions = 10;
+
+    function updateProgress() {
+      const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
+      const progress = (answeredQuestions / totalQuestions) * 100;
+      progressFill.style.width = progress + '%';
+    }
+
+    // Add event listeners to all radio buttons
+    form.addEventListener('change', function(e) {
+      updateProgress();
+      
+      // Check if all questions are answered
+      const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
+      
+      if (answeredQuestions === totalQuestions) {
+        // Add a slight delay for better UX, then auto-submit
+        setTimeout(() => {
+          // Calculate score
+          let score = 0;
+          for (let i = 1; i <= totalQuestions; i++) {
+            const selectedOption = form.querySelector(`input[name="q${i}"]:checked`);
+            if (selectedOption) {
+              score += parseInt(selectedOption.value);
+            }
+          }
+          
+          // Show completion message briefly
+          const submitBtn = document.querySelector('.submit-btn');
+          submitBtn.textContent = 'Processing Results...';
+          submitBtn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
+          
+          // Redirect to result page with score after a short delay
+          setTimeout(() => {
+            window.location.href = `/result?score=${score}`;
+
+          }, 1500);
+        }, 500);
+      }
+    });
+
+    // Add smooth scroll effect for better UX
+    document.addEventListener('DOMContentLoaded', function() {
+      const questions = document.querySelectorAll('.question');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+          }
+        });
+      }, {
+        threshold: 0.1
+      });
+
+      questions.forEach(question => {
+        observer.observe(question);
+      });
+    });
+  </script>
+</body>
+</html>

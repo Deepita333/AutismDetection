@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Q-CHAT-10 Assessment Results</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+      width: 100px;
+      height: 100px;
+      top: 15%;
+      left: 8%;
+      animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+      width: 80px;
+      height: 80px;
+      top: 70%;
+      right: 15%;
+      animation-delay: 3s;
+    }
+    
+    .shape:nth-child(3) {
+      width: 120px;
+      height: 120px;
+      bottom: 10%;
+      left: 25%;
+      animation-delay: 6s;
+    }
+    
+    .shape:nth-child(4) {
+      width: 60px;
+      height: 60px;
+      top: 40%;
+      right: 30%;
+      animation-delay: 1.5s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+      50% { transform: translateY(-30px) rotate(180deg); opacity: 1; }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      animation: slideInDown 1s ease-out;
+    }
+    
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      font-weight: 400;
+      animation: slideInUp 1s ease-out 0.3s both;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .results-container {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 30px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .score-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      animation: slideInLeft 1s ease-out 0.6s both;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .score-display {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      animation: scoreCount 2s ease-out 1.5s both;
+    }
+    
+    .score-label {
+      font-size: 1.2rem;
+      color: #4a5568;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .risk-level {
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      animation: slideInUp 1s ease-out 1.8s both;
+    }
+    
+    .risk-low {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+      color: white;
+    }
+    
+    .risk-moderate {
+      background: linear-gradient(135deg, #ed8936, #dd6b20);
+      color: white;
+    }
+    
+    .risk-high {
+      background: linear-gradient(135deg, #e53e3e, #c53030);
+      color: white;
+    }
+    
+    @keyframes scoreCount {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .interpretation-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      animation: slideInRight 1s ease-out 0.9s both;
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .interpretation-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .interpretation-text {
+      color: #4a5568;
+      line-height: 1.7;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    
+    .recommendations {
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 25px;
+    }
+    
+    .recommendations-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 15px;
+    }
+    
+    .recommendation-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      color: #4a5568;
+      line-height: 1.6;
+    }
+    
+    .recommendation-item::before {
+      content: '✓';
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 12px;
+      margin-top: 2px;
+    }
+    
+    .info-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 2;
+      animation: slideInUp 1s ease-out 1.2s both;
+    }
+    
+    .disclaimer {
+      background: linear-gradient(135deg, #fef5e7, #fed7aa);
+      border-radius: 16px;
+      padding: 25px;
+      border-left: 5px solid #ed8936;
+      margin-bottom: 25px;
+    }
+    
+    .disclaimer-title {
+      font-weight: 700;
+      color: #9c4221;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .disclaimer-text {
+      color: #744210;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+      position: relative;
+      z-index: 2;
+      animation: slideInUp 1s ease-out 1.5s both;
+    }
+    
+    .btn {
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.9);
+      color: #667eea;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(102, 126, 234, 0.1);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+      .results-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .score-card,
+      .interpretation-card,
+      .info-panel {
+        padding: 25px;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .score-display {
+        font-size: 3rem;
+      }
+      
+      .actions {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+    
+    .progress-ring {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+      fill: none;
+      stroke: rgba(102, 126, 234, 0.2);
+      stroke-width: 8;
+    }
+    
+    .progress-ring-progress {
+      fill: none;
+      stroke: url(#gradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      animation: progressRing 2s ease-out 1.5s forwards;
+    }
+    
+    @keyframes progressRing {
+      to {
+        stroke-dashoffset: var(--progress-offset);
+      }
+    }
+    
+    .chart-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>Assessment Results</h1>
+      <p class="subtitle">Q-CHAT-10 Autism Screening Analysis</p>
+    </div>
+
+    <div class="results-container">
+      <div class="score-card">
+        <div class="chart-container">
+          <svg class="progress-ring" width="120" height="120">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <circle class="progress-ring-circle" cx="60" cy="60" r="45"></circle>
+            <circle class="progress-ring-progress" cx="60" cy="60" r="45" id="progressCircle"></circle>
+          </svg>
+        </div>
+        
+        <div class="score-display" id="scoreDisplay">0</div>
+        <div class="score-label">out of 10</div>
+        <div class="risk-level" id="riskLevel">Calculating...</div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(102, 126, 234, 0.2);">
+          <div style="font-size: 0.9rem; color: #718096;">Assessment completed on</div>
+          <div style="font-weight: 600; color: #4a5568;" id="currentDate"></div>
+        </div>
+      </div>
+
+      <div class="interpretation-card">
+        <div class="interpretation-title">
+          <div class="icon">📊</div>
+          Score Interpretation
+        </div>
+        <div class="interpretation-text" id="interpretationText">
+          Loading interpretation...
+        </div>
+        
+        <div class="recommendations" id="recommendationsSection">
+          <div class="recommendations-title">Recommended Next Steps</div>
+          <div id="recommendations">
+            Loading recommendations...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div class="disclaimer">
+        <div class="disclaimer-title">
+          ⚠️ Important Disclaimer
+        </div>
+        <div class="disclaimer-text">
+          This screening tool is not a diagnostic instrument. The Q-CHAT-10 is designed to identify children who may benefit from further developmental evaluation. A positive result does not confirm an autism diagnosis, and professional assessment by qualified healthcare providers is essential for accurate diagnosis and appropriate intervention planning.
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-top: 25px;">
+        <div style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 10px;">👨‍⚕️</div>
+          <div style="font-weight: 600; color: #2d3748; margin-bottom: 5px;">Professional Consultation</div>
+          <div style="color: #718096; font-size: 0.9rem;">Discuss results with your pediatrician or developmental specialist</div>
+        </div>
+        
+        <div style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 10px;">📋</div>
+          <div style="font-weight: 600; color: #2d3748; margin-bottom: 5px;">Comprehensive Assessment</div>
+          <div style="color: #718096; font-size: 0.9rem;">Consider formal developmental evaluation if recommended</div>
+        </div>
+        
+        <div style="text-align: center;">
+          <div style="font-size: 2rem; margin-bottom: 10px;">🎯</div>
+          <div style="font-weight: 600; color: #2d3748; margin-bottom: 5px;">Early Intervention</div>
+          <div style="color: #718096; font-size: 0.9rem;">Access support services and resources as needed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.print()">
+        Download Results
+      </button>
+      <a href="assessment.html" class="btn btn-secondary">
+        Next Assessment
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Get score from URL parameters or use demo score
+    function getScoreFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return parseInt(urlParams.get('score')) || 0;
+    }
+
+    // Calculate interpretation based on score
+    function getInterpretation(score) {
+      if (score >= 0 && score <= 2) {
+        return {
+          level: 'Low Risk',
+          className: 'risk-low',
+          text: 'Your child\'s responses suggest a low likelihood of autism spectrum characteristics. The behaviors described are generally typical for their developmental stage.',
+          recommendations: [
+            'Continue regular developmental monitoring during pediatric visits',
+            'Maintain open communication with teachers and caregivers',
+            'Support your child\'s ongoing social and communication development',
+            'Trust your instincts - consult a professional if you have concerns'
+          ]
+        };
+      } else if (score >= 3 && score <= 6) {
+        return {
+          level: 'Moderate Risk',
+          className: 'risk-moderate',
+          text: 'Your child shows some characteristics that may warrant further evaluation. While this doesn\'t confirm autism, it suggests discussing these observations with a healthcare professional.',
+          recommendations: [
+            'Schedule a consultation with your pediatrician to discuss these results',
+            'Consider requesting a developmental screening or evaluation',
+            'Document specific behaviors and examples to share with professionals',
+            'Research early intervention resources in your area',
+            'Connect with support groups and educational resources'
+          ]
+        };
+      } else {
+        return {
+          level: 'Higher Risk',
+          className: 'risk-high',
+          text: 'Your child displays several characteristics commonly associated with autism spectrum conditions. A comprehensive evaluation by qualified professionals is strongly recommended.',
+          recommendations: [
+            'Contact your pediatrician immediately to discuss these results',
+            'Request a referral to a developmental pediatrician or autism specialist',
+            'Begin documenting daily behaviors, strengths, and challenges',
+            'Research local early intervention programs and services',
+            'Connect with autism support organizations and parent networks',
+            'Consider speech, occupational, or behavioral therapy evaluations'
+          ]
+        };
+      }
+    }
+
+    // Animate score counting
+    function animateScore(targetScore) {
+      const scoreElement = document.getElementById('scoreDisplay');
+      let currentScore = 0;
+      const increment = targetScore / 50;
+      
+      const timer = setInterval(() => {
+        currentScore += increment;
+        if (currentScore >= targetScore) {
+          currentScore = targetScore;
+          clearInterval(timer);
+        }
+        scoreElement.textContent = Math.floor(currentScore);
+      }, 40);
+    }
+
+    // Set progress ring
+    function setProgress(score) {
+      const circle = document.getElementById('progressCircle');
+      const percentage = (score / 10) * 100;
+      const offset = 283 - (283 * percentage) / 100;
+      circle.style.setProperty('--progress-offset', offset);
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      const score = getScoreFromURL();
+      const interpretation = getInterpretation(score);
+      
+      // Set current date
+      document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      // Animate score after delay
+      setTimeout(() => {
+        animateScore(score);
+        setProgress(score);
+      }, 1500);
+      
+      // Set risk level
+      setTimeout(() => {
+        const riskElement = document.getElementById('riskLevel');
+        riskElement.textContent = interpretation.level;
+        riskElement.className = `risk-level ${interpretation.className}`;
+      }, 2000);
+      
+      // Set interpretation text
+      setTimeout(() => {
+        document.getElementById('interpretationText').textContent = interpretation.text;
+        
+        // Set recommendations
+        const recommendationsElement = document.getElementById('recommendations');
+        recommendationsElement.innerHTML = interpretation.recommendations
+          .map(rec => `<div class="recommendation-item">${rec}</div>`)
+          .join('');
+      }, 2500);
+    });
+
+    // Demo mode - if no score provided, use a random score for demonstration
+    if (getScoreFromURL() === 0) {
+      const demoScore = Math.floor(Math.random() * 11);
+      const url = new URL(window.location);
+      url.searchParams.set('score', demoScore);
+      window.history.replaceState({}, '', url);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpectraAI - Autism Screening Platform</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --primary-blue: #2563EB;
+      --primary-light: #3B82F6;
+      --accent-purple: #8B5CF6;
+      --accent-teal: #14B8A6;
+      --warm-orange: #F59E0B;
+      --soft-pink: #EC4899;
+      --background: #FEFCFF;
+      --surface: #FFFFFF;
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --border: #E2E8F0;
+      --success: #10B981;
+      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px) scale(0.95);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Animated Background Elements */
+    .bg-shapes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .shape-1 {
+      width: 100px;
+      height: 100px;
+      background: var(--gradient-1);
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 150px;
+      height: 150px;
+      background: var(--gradient-2);
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    .shape-3 {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-3);
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    /* Splash Screen Styles */
+    .splash-container {
+      text-align: center;
+      max-width: 600px;
+      padding: 2rem;
+    }
+
+    .logo {
+      font-size: 4rem;
+      font-weight: 700;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .tagline {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    .hero-icon {
+      width: 120px;
+      height: 120px;
+      margin: 2rem auto;
+      background: var(--gradient-1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      animation: float 3s ease-in-out infinite;
+      box-shadow: var(--shadow-xl);
+    }
+
+    /* Button Styles */
+    .btn {
+      background: var(--gradient-1);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Onboarding Screen */
+    .onboarding-container {
+      text-align: center;
+      max-width: 800px;
+      padding: 2rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.3s ease;
+      border: 1px solid var(--border);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+
+    .feature-card:nth-child(2) .feature-icon {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+
+    .feature-card:nth-child(3) .feature-icon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-blue);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-blue);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Form Container */
+    .form-container {
+      max-width: 700px;
+      width: 100%;
+      background: var(--surface);
+      margin: 2rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .form-header {
+      background: var(--gradient-1);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .form-header h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .form-header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .form-content {
+      padding: 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: var(--surface);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group select {
+      cursor: pointer;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--gradient-1);
+      color: white;
+      border: none;
+      padding: 1.2rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Progress Indicator */
+    .progress-indicator {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+    }
+
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .progress-dot.active {
+      background: var(--primary-blue);
+      transform: scale(1.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 2.5rem;
+      }
+
+      .tagline {
+        font-size: 1.2rem;
+      }
+
+      .navbar {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .form-container {
+        margin: 1rem;
+        border-radius: 16px;
+      }
+
+      .form-content {
+        padding: 1.5rem;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Voice Assistant Indicator */
+    .voice-indicator {
+      position: fixed;
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: var(--gradient-1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      animation: pulse 2s ease-in-out infinite;
+      cursor: pointer;
+    }
+
+    .voice-indicator.speaking {
+      animation: pulse 0.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Shapes -->
+  <div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Screen 1: Splash -->
+  <div class="screen active" id="screen1">
+    <div class="splash-container">
+      <div class="hero-icon">🧩</div>
+      <div class="logo">SpectraAI</div>
+      <div class="tagline">Empowering Early Detection with Compassionate AI Technology</div>
+      <button class="btn" onclick="nextScreen()">Begin Journey</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Onboarding -->
+  <div class="screen" id="screen2">
+    <div class="onboarding-container">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text-primary);">Welcome to SpectraAI</h1>
+      <p style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 2rem;">
+        Supporting families with evidence-based autism screening for toddlers
+      </p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Precise Screening</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Advanced Q-CHAT assessment powered by clinical research</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💙</div>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Compassionate Care</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Designed with empathy for families and children</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Detailed Reports</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Comprehensive analysis and professional insights</p>
+        </div>
+      </div>
+      
+      <button class="btn" onclick="nextScreen()">Continue to Assessment</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Main Form -->
+  <div class="screen" id="screen3" style="align-items: flex-start; padding-top: 0;">
+    <nav class="navbar">
+      <div class="nav-logo">SpectraAI</div>
+      <div class="nav-links">
+        <a href="#" onclick="showScreen(3)">Register</a>
+        <a href="#">History</a>
+        <a href="#">Q-CHAT</a>
+        <a href="#">Reports</a>
+      </div>
+    </nav>
+
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Patient Information</h2>
+        <p>Please provide accurate details for the best assessment experience</p>
+      </div>
+      
+      <div class="form-content">
+        <form action="/" method="POST">
+          <div class="form-group">
+            <label for="name">Child's Name</label>
+            <input type="text" id="name" name="name" required placeholder="Enter child's full name">
+          </div>
+
+          <div class="form-group">
+            <label for="age">Age (in months)</label>
+            <input type="number" id="age" name="age" required placeholder="e.g., 24" min="12" max="60">
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="">Please select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="ethnicity">Ethnicity</label>
+            <select id="ethnicity" name="ethnicity" required>
+              <option value="">Please select ethnicity</option>
+              <option value="1">Asian</option>
+              <option value="2">Black/African American</option>
+              <option value="3">Hispanic/Latino</option>
+              <option value="4">White/Caucasian</option>
+              <option value="5">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="jaundice">Has the child experienced jaundice?</label>
+            <select id="jaundice" name="jaundice" required>
+              <option value="">Please select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="family_asd">Family history of Autism Spectrum Disorder?</label>
+            <select id="family_asd" name="family_asd" required>
+              <option value="">Please select</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="completed_by">Assessment completed by</label>
+            <select id="completed_by" name="completed_by" required>
+              <option value="">Please select</option>
+              <option value="1">Parent/Guardian</option>
+              <option value="2">Medical Professional</option>
+              <option value="3">Other Caregiver</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">Begin Q-CHAT Assessment</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Voice Assistant Indicator -->
+    <div class="voice-indicator" id="voiceIndicator" title="Voice Assistant">
+      🎤
+    </div>
+  </div>
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-dot active" id="dot1"></div>
+    <div class="progress-dot" id="dot2"></div>
+    <div class="progress-dot" id="dot3"></div>
+  </div>
+
+  <script>
+    let currentScreen = 1;
+    const totalScreens = 3;
+
+    function updateProgressIndicator() {
+      for (let i = 1; i <= totalScreens; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        if (i === currentScreen) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      }
+    }
+
+    function showScreen(screenNum) {
+      // Hide current screen
+      document.getElementById(`screen${currentScreen}`).classList.remove('active');
+      
+      // Show target screen
+      currentScreen = screenNum;
+      document.getElementById(`screen${currentScreen}`).classList.add('active');
+      
+      // Update progress indicator
+      updateProgressIndicator();
+      
+      // Voice assistant for form screen
+      if (currentScreen === 3) {
+        setTimeout(() => {
+          speakWelcomeMessage();
+        }, 1000);
+      }
+    }
+
+    function nextScreen() {
+      if (currentScreen < totalScreens) {
+        showScreen(currentScreen + 1);
+      }
+    }
+
+    function speakWelcomeMessage() {
+      if ('speechSynthesis' in window) {
+        const voiceIndicator = document.getElementById('voiceIndicator');
+        voiceIndicator.classList.add('speaking');
+        
+        const msg = new SpeechSynthesisUtterance(
+          "Welcome to SpectraAI. I'm here to guide you through the autism screening process. Please take your time filling out the patient information form. Each detail helps us provide the most accurate assessment for your child."
+        );
+        
+        // Set voice preferences
+        const voices = speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice => 
+          voice.lang.startsWith('en') && 
+          (voice.name.includes('Female') || voice.name.includes('Karen') || voice.name.includes('Samantha'))
+        ) || voices.find(voice => voice.lang.startsWith('en'));
+        
+        if (preferredVoice) {
+          msg.voice = preferredVoice;
+        }
+        
+        msg.rate = 0.9;
+        msg.pitch = 1.1;
+        msg.volume = 0.8;
+        
+        msg.onend = function() {
+          voiceIndicator.classList.remove('speaking');
+        };
+        
+        speechSynthesis.speak(msg);
+      }
+    }
+
+    // Initialize voices (some browsers need this)
+    if ('speechSynthesis' in window) {
+      speechSynthesis.onvoiceschanged = function() {
+        // Voices are now loaded
+      };
+    }
+
+    // Voice assistant click handler
+    document.getElementById('voiceIndicator').addEventListener('click', function() {
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        this.classList.remove('speaking');
+      } else if (currentScreen === 3) {
+        speakWelcomeMessage();
+      }
+    });
+
+    // Form validation and enhancement
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Validate all required fields
+          const requiredFields = form.querySelectorAll('[required]');
+          let isValid = true;
+          
+          requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+              isValid = false;
+              field.style.borderColor = '#EF4444';
+              field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+            } else {
+              field.style.borderColor = 'var(--border)';
+              field.style.boxShadow = 'none';
+            }
+          });
+          
+          if (isValid) {
+            // Show success message or proceed to next step
+            const submitBtn = form.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+            
+           setTimeout(() => {
+  submitBtn.textContent = '✓ Assessment Ready';
+  submitBtn.style.background = 'var(--success)';
+
+  // After 1 second, redirect to /qchat
+  setTimeout(() => {
+    window.location.href = "{{ url_for('qchat') }}";
+  }, 1000);
+
+}, 2000); // Outer delay of 2 seconds
+}else {
+            // Speak validation error
+            if ('speechSynthesis' in window) {
+              const msg = new SpeechSynthesisUtterance(
+                "Please fill in all required fields to continue with the assessment."
+              );
+              msg.rate = 0.9;
+              speechSynthesis.speak(msg);
+            }
+          }
+        });
+      }
+      
+      // Initialize progress indicator
+      updateProgressIndicator();
+    });
+
+    // Smooth animations for form fields
+    document.querySelectorAll('input, select').forEach(field => {
+      field.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+        this.parentElement.style.transition = 'transform 0.2s ease';
+      });
+      
+      field.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+  </script>
+</body>
+</html>
